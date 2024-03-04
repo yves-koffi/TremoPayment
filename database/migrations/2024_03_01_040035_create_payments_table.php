@@ -18,6 +18,7 @@ return new class extends Migration {
             $table->string(column: "reference")->unique()->comment("referenceTremo");
             $table->enum(column: 'nature_recette', allowed: ["bac", "ing", "master"])->default("bac")->comment("natureRecette");
             $table->string(column: "payment_phone")->comment("telephonePayment");
+            $table->string(column: "status")->default("wait");
             $table->timestamps();
         });
     }

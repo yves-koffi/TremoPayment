@@ -3,8 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\FeedbackRequest;
+use App\Models\AutoSend;
 use App\Models\Payment;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Http;
 
 class FeedbackPaymentController extends Controller
 {
@@ -16,10 +18,28 @@ class FeedbackPaymentController extends Controller
 
         $reference = $data["reference"];
         unset($data["reference"]);
-        Payment::query()->firstOrCreate($data, ["reference" => $reference]);
+        $payment = Payment::query()->firstOrCreate($data, ["reference" => $reference]);
 
-        $response = Http::asForm()->post('http://example.com/users', $data);
-        //competition
+
+        if (!in_array($payment["status"], ["success", "not_send"])) {
+            if ($as = AutoSend::query()->where("nature_recette", "=", $data['nature_recette'])->first()) {
+                $response = Http::asForm()->post($as->url, $data);
+                if ($response->failed()) {
+                    $payment->update([
+                        "status" => "failed"
+                    ]);
+                } else {
+                    $payment->update([
+                        "status" => "success"
+                    ]);
+                }
+            } else {
+                $payment->update([
+                    "status" => "not_send"
+                ]);
+            }
+        }
+
 
         return response()->json(
             data: [
