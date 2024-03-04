@@ -18,6 +18,9 @@ class FeedbackPaymentController extends Controller
         unset($data["reference"]);
         Payment::query()->firstOrCreate($data, ["reference" => $reference]);
 
+        $response = Http::asForm()->post('http://example.com/users', $data);
+        //competition
+
         return response()->json(
             data: [
                 "response_code" => 1,

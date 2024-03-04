@@ -10,12 +10,11 @@ return new class extends Migration {
      */
     public function up(): void
     {
-        Schema::create(table: 'users', callback: function (Blueprint $table) {
+        Schema::create(table: 'competitions', callback: function (Blueprint $table) {
             $table->id();
-            $table
-                ->enum(column: 'nature_recette', allowed: ["bac", "ing","master"])
-                ->default("bac");
-            $table->string(column: 'api_token')->unique();
+            $table->string(column: "key");
+            $table->string(column: "name");
+            $table->string(column: "url")->nullable();
             $table->timestamps();
         });
     }
@@ -25,6 +24,6 @@ return new class extends Migration {
      */
     public function down(): void
     {
-        Schema::dropIfExists('users');
+        Schema::dropIfExists('competitions');
     }
 };
